@@ -2,16 +2,26 @@
 using EmployeeDirectory.BAL.Exceptions;
 using EmployeeDirectory.DAL.Extensions;
 using EmployeeDirectory.DAL.Exceptions;
-using EmployeeDirectory.DAL.Data;
+using EmployeeDirectory.DAL.Interfaces;
+using EmployeeDirectory.BAL.Interfaces;
 
 namespace EmployeeDirectory.BAL.Providers
 {
-    public static class Employee
+   
+    public class EmployeeProvider:IEmployeeProvider
     {
-        public static void AddEmployee(DTO.Employee employee)
+
+        private readonly IEmployeeRepository _employeeRepository;
+
+        public EmployeeProvider(IEmployeeRepository employeeRepository)
+        {
+            _employeeRepository = employeeRepository;
+        }
+
+        public void AddEmployee(DTO.Employee employee)
         {
             List<DAL.Models.Employee> employees;
-            employees = EmployeeHandler.GetEmployeeDetails().OrderBy(x => x.Id).ToList();
+            employees = _employeeRepository.GetEmployeeDetails().OrderBy(x => x.Id).ToList();
             int employeeCount = int.Parse(employees[^1].Id[2..]) + 1;
             string id = string.Format("{0:0000}", employeeCount);
             id = "TZ" + id;
@@ -30,13 +40,13 @@ namespace EmployeeDirectory.BAL.Providers
                 Department = employee.Department,
                 Project = employee.Project,
             };
-            EmployeeHandler.InsertEmployee(user);
+            _employeeRepository.InsertEmployee(user);
         }
 
-        public static List<DAL.Models.Employee> GetEmployees()
+        public List<DAL.Models.Employee> GetEmployees()
         {
             List<DAL.Models.Employee> employees;
-            employees = EmployeeHandler.GetEmployeeDetails();
+            employees = _employeeRepository.GetEmployeeDetails();
             if (employees.Count == 0)
             {
                 throw new RecordNotFound("Data Base is empty");
@@ -47,7 +57,7 @@ namespace EmployeeDirectory.BAL.Providers
             }
         }
 
-        public static void EditEmployeeDetails(string selectedData, string? id, string label)
+        public void EditEmployeeDetails(string selectedData, string? id, string label)
         {
          
             if (id.IsNullOrEmptyOrWhiteSpace())
@@ -57,8 +67,8 @@ namespace EmployeeDirectory.BAL.Providers
             else if (IsEmployeePresent(id))
             {
                 id = id?.ToUpper();
-                DAL.Models.Employee? employee = EmployeeHandler.GetEmployee(id);
-                EmployeeHandler.UpdateEmployee(selectedData, id, label);
+                DAL.Models.Employee? employee = _employeeRepository.GetEmployee(id);
+                _employeeRepository.UpdateEmployee(selectedData, id, label);
             }
             else
             {
@@ -66,7 +76,7 @@ namespace EmployeeDirectory.BAL.Providers
             }
         }
 
-        public static void DeleteEmployee(string? id)
+        public  void DeleteEmployee(string? id)
         {
             if (id.IsNullOrEmptyOrWhiteSpace())
             {
@@ -74,7 +84,7 @@ namespace EmployeeDirectory.BAL.Providers
             }
             else if(IsEmployeePresent(id))
             {
-                EmployeeHandler.DeleteEmployee(id);
+                _employeeRepository.DeleteEmployee(id);
             }
             else
             {
@@ -82,7 +92,7 @@ namespace EmployeeDirectory.BAL.Providers
             }
         }
 
-        public static DAL.Models.Employee GetEmployeeById(string? id)
+        public DAL.Models.Employee? GetEmployeeById(string? id)
         {
             if (id.IsNullOrEmptyOrWhiteSpace())
             {
@@ -90,7 +100,7 @@ namespace EmployeeDirectory.BAL.Providers
             }
             else if(IsEmployeePresent(id))
             {
-                DAL.Models.Employee? employee = EmployeeHandler.GetEmployee(id);
+                DAL.Models.Employee? employee = _employeeRepository.GetEmployee(id);
                 return employee;
             }
             else
@@ -99,11 +109,11 @@ namespace EmployeeDirectory.BAL.Providers
             }
         }
 
-        public static bool IsEmployeePresent(string? id)
+        public  bool IsEmployeePresent(string? id)
         {
            
                 id = id!.ToUpper();
-                DAL.Models.Employee? employee = EmployeeHandler.GetEmployee(id);
+                DAL.Models.Employee? employee = _employeeRepository.GetEmployee(id);
                 if (employee is null)
                 {
                     return false;

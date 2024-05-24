@@ -2,11 +2,13 @@
 {
     public class Role
     {
+        public required int Id { get; set; }
+
         public required string? Name { get; set; }
 
-        public string Location { get; set; } = string.Empty;
+        public required int Location { get; set; }
 
-        public string Department { get; set; } = string.Empty;
+        public required int Department { get; set; }
 
         public string? Description { get; set; }
     }

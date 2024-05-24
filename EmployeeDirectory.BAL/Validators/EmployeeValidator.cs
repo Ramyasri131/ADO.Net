@@ -1,9 +1,8 @@
 ﻿using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using EmployeeDirectory.DAL.Models;
-using EmployeeDirectory.BAL.Exceptions;
 using EmployeeDirectory.DAL.Extensions;
+using EmployeeDirectory.BAL.Providers;
 
 namespace EmployeeDirectory.BAL.Validators
 {
@@ -11,6 +10,7 @@ namespace EmployeeDirectory.BAL.Validators
     {
         public static List<string> ValidateDetails(BAL.DTO.Employee employee)
         {
+            int selectedKey;
             List<string> invalidInputs = [];
             foreach (PropertyInfo propertyInfo in employee.GetType().GetProperties())
             {
@@ -50,6 +50,34 @@ namespace EmployeeDirectory.BAL.Validators
                             if (employee.MobileNumber.ToString()!.Length != 10)
                             {
                                 invalidInputs.Add("Mobile Number");
+                            }
+                            break;
+                        case "Location":
+                            selectedKey = int.Parse(employee.Location);
+                            if (selectedKey <= 0 || selectedKey > LocationProvider.Location.Count)
+                            {
+                                invalidInputs.Add("Location");
+                            }
+                            break;
+                        case "Department":
+                            selectedKey = int.Parse(employee.Department);
+                            if (selectedKey <= 0 || selectedKey > DepartmentsProvider.Departments.Count)
+                            {
+                                invalidInputs.Add("Department");
+                            }
+                            break;
+                        case "Manager":
+                            selectedKey = int.Parse(employee.Manager);
+                            if (selectedKey <= 0 || selectedKey > ManagerProvider.Managers.Count)
+                            {
+                                invalidInputs.Add("Manager");
+                            }
+                            break;
+                        case "Project":
+                            selectedKey = int.Parse(employee.Project);
+                            if (selectedKey <= 0 || selectedKey > ProjectsProvider.Projects.Count)
+                            {
+                                invalidInputs.Add("Project");
                             }
                             break;
                     }
@@ -105,6 +133,14 @@ namespace EmployeeDirectory.BAL.Validators
                         throw new BAL.Exceptions.InvalidData("Please enter valid Joining Date");
                     }
                     break;
+                case "Location":
+                    throw new BAL.Exceptions.InvalidData("Please enter option");
+                case "Department":
+                    throw new BAL.Exceptions.InvalidData("Please enter option");
+                case "Manager":
+                    throw new BAL.Exceptions.InvalidData("Please enter option");
+                case "Role":
+                    throw new BAL.Exceptions.InvalidData("Please enter option");
             }
         }
     }

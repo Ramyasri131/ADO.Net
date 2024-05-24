@@ -3,38 +3,47 @@ using EmployeeDirectory.DAL.StaticData;
 using EmployeeDirectory.BAL.Validators;
 using EmployeeDirectory.DAL.Exceptions;
 using EmployeeDirectory.Interfaces;
+using EmployeeDirectory.BAL.Providers;
+using EmployeeDirectory.BAL.Interfaces;
 
 namespace EmployeeDirectory.Services
 {
-    public class Employee: IEmployeeService
+    public class EmployeeService: IEmployeeService
     {
-        public void GetEmployeeInput()
+        private readonly IEmployeeProvider _employeeProvider;
+
+        public EmployeeService(IEmployeeProvider employeeProvider)
+        {
+            _employeeProvider = employeeProvider;
+        }
+
+        public void GetEmployee()
         {
             Display.Print("Enter First Name:");
             string? firstName = Console.ReadLine();
             Display.Print("Enter Last Name:");
             string? lastName = Console.ReadLine();
             Display.Print("Enter Date Of Birth in (dd/mm/yyyy):");
-            string? dateOfBirth = Console.ReadLine();
+            string? dateOfBirth = Console.ReadLine()!;
             Display.Print("Enter Email:");
             string? email = Console.ReadLine();
             Display.Print("Enter Mobile Number:");
             long mobileNumber = long.Parse(Console.ReadLine()!);
             Display.Print("Enter Date Of Join in (dd/mm/yyyy):");
-            string? dateOfJoin = Console.ReadLine();
+            string? dateOfJoin = Console.ReadLine()!;
             Display.Print("select Location:");
-            string location = SelectValidDetails("location", Constants.Locations);
+            string location = GetDetails("location", LocationProvider.Location,"Add");
             Display.Print("select JobTitle:");
-            string jobTitle = SelectValidDetails("jobTitle", Constants.Roles);
+            string jobTitle = GetDetails("jobTitle", RoleProvider.Roles, "Add");
             Display.Print("select Department:");
-            string department = SelectValidDetails("department", Constants.Departments);
+            string department = GetDetails("department", DepartmentsProvider.Departments, "Add");
             Display.Print("select Manager");
-            string manager = SelectValidDetails("Manager", Constants.Managers);
+            string manager = GetDetails("Manager", ManagerProvider.Managers, "Add");
             Display.Print("select Project");
-            string project = SelectValidDetails("Project", Constants.Projects);
+            string project = GetDetails("Project", ProjectsProvider.Projects, "Add");
             BAL.DTO.Employee employeeInput = new()
             {
-                FirstName = firstName,
+                FirstName = firstName,                                                                                          
                 LastName = lastName,
                 DateOfBirth = dateOfBirth,
                 Email = email,
@@ -49,7 +58,7 @@ namespace EmployeeDirectory.Services
             List<string> InvalidInputs = EmployeeValidator.ValidateDetails(employeeInput);
             if (InvalidInputs.Count == 0)
             {
-               BAL.Providers.Employee.AddEmployee(employeeInput);
+               _employeeProvider.AddEmployee(employeeInput);
             }
             else
             {
@@ -57,7 +66,7 @@ namespace EmployeeDirectory.Services
                 {
                     Display.Print($"Enter Valid {input}");
                 }
-                GetEmployeeInput();
+                GetEmployee();
             }
         }
 
@@ -65,8 +74,8 @@ namespace EmployeeDirectory.Services
         {
             try
             {
-                List<DAL.Models.Employee> employeeData = BAL.Providers.Employee.GetEmployees();
-                DisplayData.PrintEmployeesData(employeeData);
+                List<DAL.Models.Employee> employeeData = _employeeProvider.GetEmployees();
+                Display.PrintEmployeesData(employeeData);
             }
             catch (RecordNotFound)
             {
@@ -80,8 +89,8 @@ namespace EmployeeDirectory.Services
             string? id = Console.ReadLine();
             try
             {
-                DAL.Models.Employee employeeData = BAL.Providers.Employee.GetEmployeeById(id);
-                DisplayData.PrintEmployeeData(employeeData);
+                DAL.Models.Employee? employeeData = _employeeProvider.GetEmployeeById(id);
+                Display.PrintEmployeeData(employeeData!);
             }
             catch (RecordNotFound)
             {
@@ -108,29 +117,33 @@ namespace EmployeeDirectory.Services
                 string? selectedData;
                 if (string.Equals(label, "Location"))
                 {
-                    selectedData = SelectValidDetails(label, Constants.Locations);
+                    selectedData = GetDetails(label, LocationProvider.Location,"Edit");
                 }
                 else if (string.Equals(label, "Department"))
                 {
-                    selectedData = SelectValidDetails(label, Constants.Departments);
+                    selectedData = GetDetails(label, DepartmentsProvider.Departments,"Edit");
                 }
                 else if (string.Equals(label, "JobTitle"))
                 {
-                    selectedData = SelectValidDetails(label, Constants.Roles);
+                    selectedData = GetDetails(label, RoleProvider.Roles, "Edit");
                 }
                 else if (string.Equals(label, "Manager"))
                 {
-                    selectedData = SelectValidDetails(label, Constants.Managers);
+                    selectedData = GetDetails(label, ManagerProvider.Managers, "Edit");
                 }
                 else if (string.Equals(label, "Project"))
                 {
-                    selectedData = SelectValidDetails(label, Constants.Projects);
+                    selectedData = GetDetails(label, ProjectsProvider.Projects, "Edit");
+                }
+                else if(string.Equals(label, "DateOfJoin") || string.Equals(label, "DateOfJoin"))
+                {
+                    selectedData = GetValidDetails(label);
                 }
                 else
                 {
                     selectedData = GetValidDetails(label);
                 }
-                 BAL.Providers.Employee.EditEmployeeDetails(selectedData, id, label);
+                _employeeProvider.EditEmployeeDetails(selectedData, id, label);
             }
             catch (BAL.Exceptions.InvalidData)
             {
@@ -140,13 +153,10 @@ namespace EmployeeDirectory.Services
             {
                 throw;
             }
-            catch (FormatException)
-            {
-                throw;
-            }
+           
         }
 
-        public static string SelectValidDetails(string label, Dictionary<int, string> list)
+        public static string GetDetails(string label, Dictionary<int, string> list,string operation)
         {
             foreach (KeyValuePair<int, string> item in list)
             {
@@ -154,25 +164,24 @@ namespace EmployeeDirectory.Services
             }
             string? enteredKey = Console.ReadLine();
             int selectedKey = int.Parse(enteredKey!);
-            if (selectedKey <= 0 && selectedKey > list.Count)
+            if (selectedKey <= 0 || selectedKey > list.Count)
             {
-                Display.Print("Choose from the given options");
-                return SelectValidDetails(label, list);
+                if(string.Equals(operation,"Edit"))
+                {
+                    EmployeeValidator.ValidateData(label, enteredKey);
+                }
             }
-            else
-            {
-                return list[selectedKey];
-            }
+            return selectedKey.ToString();
         }
 
         public static string GetValidDetails(string label)
         {
             Display.Print($"Enter {label}");
-            string? inputData = Console.ReadLine();
+            string? inputData = Console.ReadLine()!;
             try
             {
                 EmployeeValidator.ValidateData(label,inputData!);
-                return inputData!;
+                return inputData;
             }
             catch (BAL.Exceptions.InvalidData)
             {
@@ -186,7 +195,7 @@ namespace EmployeeDirectory.Services
             string? enteredEmpId = Console.ReadLine();
             try
             {
-                BAL.Providers.Employee.DeleteEmployee(enteredEmpId);
+                _employeeProvider.DeleteEmployee(enteredEmpId);
             }
             catch (RecordNotFound)
             {

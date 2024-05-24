@@ -3,7 +3,7 @@ using EmployeeDirectory.DAL.StaticData;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.DAL.Exceptions;
 using EmployeeDirectory.BAL.Exceptions;
-using System.Text.Json;
+using EmployeeDirectory.BAL.Interfaces;
 
 namespace EmployeeDirectory.Manager
 {
@@ -12,16 +12,31 @@ namespace EmployeeDirectory.Manager
     {
         private readonly IEmployeeService _employeeService;
         private readonly IRoleService _roleService;
+        private readonly IRoleProvider _roleProvider;
+        private readonly IDepartmentProvider _departmentProvider;
+        private readonly ILocationProvider _locationProvider;
+        private readonly IManagerProvider _managerProvider;
+        private readonly IProjectProvider _projectProvider;
 
-        public Menu(IEmployeeService employeeService, IRoleService roleService)
+
+        public Menu(IEmployeeService employeeService, IRoleService roleService, IRoleProvider roleProvider, IDepartmentProvider departmentProvider, ILocationProvider locationProvider, IManagerProvider managerProvider, IProjectProvider projectProvider)
         {
             _employeeService = employeeService;
             _roleService = roleService;
+            _roleProvider = roleProvider;
+            _departmentProvider = departmentProvider;
+            _locationProvider = locationProvider;
+            _managerProvider = managerProvider;
+            _projectProvider = projectProvider;
         }
 
         public void DisplayMainMenu()
         {
-            Constants.GetRoles();
+            _departmentProvider.GetDepartments();
+            _locationProvider.GetLocations();
+            _managerProvider.GetManagers();
+            _projectProvider.GetProjects();
+            _roleProvider.GenerateRoleList();
             Display.Print("Main Menu");
             foreach (var item in Constants.MainMenu)
             {
@@ -72,7 +87,7 @@ namespace EmployeeDirectory.Manager
                 switch (selectedOption)
                 {
                     case 1:
-                        _employeeService.GetEmployeeInput();
+                        _employeeService.GetEmployee();
                         break;
                     case 2:
                         _employeeService.DisplayEmployees();
@@ -94,23 +109,18 @@ namespace EmployeeDirectory.Manager
                         break;
                 }
             }
-            catch (FormatException e)
-            {
-                Display.Print(e.ToString());
+            catch(FormatException)
+            { 
+                Display.Print("Enter Integer value");
             }
             catch(RecordNotFound ex)
             {
-                Display.Print(ex.ToString());
-
+                Display.Print(ex.Message);
             }
             catch (InvalidData ex)
             {
-                Display.Print(ex.ToString());
+                Display.Print(ex.Message);
 
-            }
-            catch (JsonException ex)
-            {
-                Display.Print(ex.ToString());
             }
             finally
             {
@@ -134,7 +144,7 @@ namespace EmployeeDirectory.Manager
                 switch (selectedOption)
                 {
                     case 1:
-                        _roleService.CollectRoleDetails();
+                        _roleService.GetRoles();
                         break;
                     case 2:
                         _roleService.DisplayRoles();
@@ -149,17 +159,13 @@ namespace EmployeeDirectory.Manager
             }
             catch (FormatException e)
             {
-                Display.Print(e.ToString());
+                Display.Print("Enter Valid Input");
             }
             catch (RecordNotFound ex)
             {
                 Display.Print(ex.ToString());
             }
             catch (InvalidData ex)
-            {
-                Display.Print(ex.ToString());
-            }
-            catch(JsonException ex)
             {
                 Display.Print(ex.ToString());
             }

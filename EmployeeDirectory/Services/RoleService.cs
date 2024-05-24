@@ -1,34 +1,41 @@
 ﻿using EmployeeDirectory.Utilities;
-using EmployeeDirectory.DAL.StaticData;
 using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.DAL.Exceptions;
-using System.Text.Json;
+using EmployeeDirectory.BAL.Providers;
+using EmployeeDirectory.BAL.Interfaces;
 
 namespace EmployeeDirectory.Services
 {
-    public class Role:IRoleService
+    public class RoleService:IRoleService
     {
-        public  void CollectRoleDetails()
+
+        private readonly IRoleProvider _roleProvider;
+
+        public RoleService(IRoleProvider roleProvider) {
+            _roleProvider = roleProvider;
+        }
+
+        public  void GetRoles()
         {
             Display.Print("Enter RoleName");
             string? roleName = Console.ReadLine();
-            DAL.Models.Role roleInput;
+            BAL.DTO.Role roleInput;
             try
             {
                 Display.Print("select department");
-                string department = SaveValidDetails("department", Constants.Departments);
+                int departmentId = GetDetails("department", DepartmentsProvider.Departments);
                 Display.Print("Enter Description");
                 string? description = Console.ReadLine();
                 Display.Print("Select Location");
-                string location = SaveValidDetails("location", Constants.Locations);
+                int locationId = GetDetails("location", LocationProvider.Location);
                 roleInput = new()
                 {
                     Name = roleName,
-                    Location = location,
-                    Department = department,
+                    Location = locationId,
+                    Department = departmentId,
                     Description = description
                 };
-                BAL.Providers.Role.AddRole(roleInput);
+                _roleProvider.AddRole(roleInput);
             }
             catch (FormatException)
             {
@@ -40,7 +47,7 @@ namespace EmployeeDirectory.Services
             }
         }
 
-        public static string SaveValidDetails(string label, Dictionary<int, string> list)
+        public static int GetDetails(string label, Dictionary<int, string> list)
         {
             foreach (KeyValuePair<int, string> item in list)
             {
@@ -53,7 +60,7 @@ namespace EmployeeDirectory.Services
                 if( selectedKey > list.Count ) {
                     throw new BAL.Exceptions.InvalidData("Choose the option from the list");
                 }
-                return list[selectedKey];
+                return selectedKey;
             }
             catch (FormatException)
             {
@@ -63,20 +70,17 @@ namespace EmployeeDirectory.Services
 
         public void DisplayRoles()
         {
-            List<DAL.Models.Role>? roleData;
+            List<BAL.DTO.Role>? roleData;
             try
             {
-                roleData = BAL.Providers.Role.GetRoles();
-                DisplayData.PrintRoleData(roleData);
+                roleData = _roleProvider.GetRoles();
+                Display.PrintRoleData(roleData);
             }
             catch(RecordNotFound)
             {
                 throw;
             }
-            catch (JsonException)
-            {
-                throw;
-            }
+           
         }
     }
 }
