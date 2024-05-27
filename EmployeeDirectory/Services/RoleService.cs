@@ -7,16 +7,12 @@ using EmployeeDirectory.BAL.Extensions;
 
 namespace EmployeeDirectory.Services
 {
-    public class RoleService:IRoleService
+    public class RoleService(IRoleProvider roleProvider) : IRoleService
     {
 
-        private readonly IRoleProvider _roleProvider;
+        private readonly IRoleProvider _roleProvider = roleProvider;
 
-        public RoleService(IRoleProvider roleProvider) {
-            _roleProvider = roleProvider;
-        }
-
-        public  void GetRoles()
+        public void GetRoles()
         {
             try
             {

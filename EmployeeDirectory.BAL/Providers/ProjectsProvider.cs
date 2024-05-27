@@ -3,15 +3,10 @@ using EmployeeDirectory.DAL.Interfaces;
 
 namespace EmployeeDirectory.BAL.Providers
 {
-    public class ProjectsProvider: IProjectProvider
+    public class ProjectsProvider(IProjectRepository ProjectRepository) : IProjectProvider
     {
         public static Dictionary<int, string> Projects = new();
-        private readonly IProjectRepository _ProjectRepository;
-
-        public ProjectsProvider(IProjectRepository ProjectRepository)
-        {
-            _ProjectRepository = ProjectRepository;
-        }
+        private readonly IProjectRepository _ProjectRepository = ProjectRepository;
 
         public void GetProjects()
         {

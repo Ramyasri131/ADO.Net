@@ -4,15 +4,10 @@ using EmployeeDirectory.BAL.Interfaces;
 namespace EmployeeDirectory.BAL.Providers
 {
 
-    public class DepartmentsProvider: IDepartmentProvider
+    public class DepartmentsProvider(IDepartmentRepository DepartmentRepository) : IDepartmentProvider
     {
         public static Dictionary<int, string> Departments = new();
-        private readonly IDepartmentRepository _DepartmentRepository;
-
-        public DepartmentsProvider(IDepartmentRepository DepartmentRepository)
-        {
-            _DepartmentRepository = DepartmentRepository;
-        }
+        private readonly IDepartmentRepository _DepartmentRepository = DepartmentRepository;
 
         public void GetDepartments()
         {
