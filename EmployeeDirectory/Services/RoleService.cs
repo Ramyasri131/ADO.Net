@@ -3,6 +3,7 @@ using EmployeeDirectory.Interfaces;
 using EmployeeDirectory.DAL.Exceptions;
 using EmployeeDirectory.BAL.Providers;
 using EmployeeDirectory.BAL.Interfaces;
+using EmployeeDirectory.BAL.Extensions;
 
 namespace EmployeeDirectory.Services
 {
@@ -17,25 +18,49 @@ namespace EmployeeDirectory.Services
 
         public  void GetRoles()
         {
-            Display.Print("Enter RoleName");
-            string? roleName = Console.ReadLine();
-            BAL.DTO.Role roleInput;
             try
             {
+                List<string> InvalidData=new();
+                Display.Print("Enter RoleName");
+                string? roleName = Console.ReadLine();
                 Display.Print("select department");
                 int departmentId = GetDetails("department", DepartmentsProvider.Departments);
                 Display.Print("Enter Description");
                 string? description = Console.ReadLine();
                 Display.Print("Select Location");
                 int locationId = GetDetails("location", LocationProvider.Location);
-                roleInput = new()
+                BAL.DTO.Role roleInput;
+                if (roleName.IsNullOrEmptyOrWhiteSpace())
                 {
-                    Name = roleName,
-                    Location = locationId,
-                    Department = departmentId,
-                    Description = description
-                };
-                _roleProvider.AddRole(roleInput);
+                    InvalidData.Add("RoleName");
+                }
+                if (departmentId > DepartmentsProvider.Departments.Count)
+                {
+                    InvalidData.Add("Department");
+                }
+                if (locationId > LocationProvider.Location.Count)
+                {
+                    InvalidData.Add("Location");
+                }
+                if (InvalidData.Count == 0)
+                {
+                    roleInput = new()
+                    {
+                        Name = roleName,
+                        Location = locationId,
+                        Department = departmentId,
+                        Description = description
+                    };
+                    _roleProvider.AddRole(roleInput);
+                }
+                else
+                {
+                    foreach (string input in InvalidData)
+                    {
+                        Display.Print($"Enter Valid {input}");
+                    }
+                    GetRoles();
+                }
             }
             catch (FormatException)
             {
@@ -54,18 +79,8 @@ namespace EmployeeDirectory.Services
                 Display.Print(item.Key + " " + item.Value);
             }
             int selectedKey;
-            try
-            {
-                selectedKey = int.Parse(Console.ReadLine()!);
-                if( selectedKey > list.Count ) {
-                    throw new BAL.Exceptions.InvalidData("Choose the option from the list");
-                }
-                return selectedKey;
-            }
-            catch (FormatException)
-            {
-                throw;
-            }
+            selectedKey = int.Parse(Console.ReadLine()!);
+            return selectedKey;
         }
 
         public void DisplayRoles()

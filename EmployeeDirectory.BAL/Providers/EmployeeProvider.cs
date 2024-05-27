@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using EmployeeDirectory.BAL.Exceptions;
-using EmployeeDirectory.DAL.Extensions;
+using EmployeeDirectory.BAL.Extensions;
 using EmployeeDirectory.DAL.Exceptions;
 using EmployeeDirectory.DAL.Interfaces;
 using EmployeeDirectory.BAL.Interfaces;

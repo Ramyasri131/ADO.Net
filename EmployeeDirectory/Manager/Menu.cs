@@ -64,9 +64,9 @@ namespace EmployeeDirectory.Manager
                         break;
                 }
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
-                Display.Print(e.ToString());
+                Display.Print("Enter valid option");
                 DisplayMainMenu();
             }
         }
@@ -157,17 +157,17 @@ namespace EmployeeDirectory.Manager
                         break;
                 }
             }
-            catch (FormatException e)
+            catch (FormatException )
             {
-                Display.Print("Enter Valid Input");
+                Display.Print("Enter Integer value");
             }
             catch (RecordNotFound ex)
             {
-                Display.Print(ex.ToString());
+                Display.Print(ex.Message);
             }
             catch (InvalidData ex)
             {
-                Display.Print(ex.ToString());
+                Display.Print(ex.Message);
             }
             finally
             {

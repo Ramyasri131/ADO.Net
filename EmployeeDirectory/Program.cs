@@ -30,8 +30,9 @@ namespace EmployeeDirectory
             serviceCollection.AddSingleton<ILocationProvider, LocationProvider>();
             serviceCollection.AddSingleton<IManagerProvider, ManagerProvider>();
             serviceCollection.AddSingleton<IProjectProvider, ProjectsProvider>();
+            serviceCollection.AddSingleton<IConnectionRepository, ConnectionRepository>();
             IConfiguration configuration = new ConfigurationBuilder().AddJsonFile("appSettings.json").Build();
-            serviceCollection.AddSingleton<IConfiguration>(configuration);
+            serviceCollection.AddSingleton(configuration);
 
             ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
             IMenuManager displayOptions = serviceProvider.GetService<IMenuManager>()!;

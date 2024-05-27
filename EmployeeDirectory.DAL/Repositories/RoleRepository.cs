@@ -1,29 +1,18 @@
 ﻿using EmployeeDirectory.DAL.Interfaces;
 using EmployeeDirectory.DAL.Models;
-using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace EmployeeDirectory.DAL.Data
 {
-    public class RoleRepository: IRoleRepository
+    public class RoleRepository(IConnectionRepository connection) : IRoleRepository
     {
-
-        private readonly IConfiguration _configuration;
-        private readonly string connectionString;
-
-        public RoleRepository(IConfiguration configuration)
-        {
-            _configuration = configuration;
-            connectionString = _configuration.GetConnectionString("EmployeeDirectoryDB");
-        }
-
         public List<Models.Role> GetRoles()
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = connection.GetConnection())
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand("select * from Roles", connection);
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand("select * from Roles", sqlConnection);
                 SqlDataReader reader = cmd.ExecuteReader();
                 List<Models.Role> roleList = new List<Models.Role>();
                 while (reader.Read())
@@ -44,11 +33,11 @@ namespace EmployeeDirectory.DAL.Data
 
         public void AddRole(Role role)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = connection.GetConnection())
             {
-                connection.Open();
+                sqlConnection.Open();
                 SqlCommand command = new SqlCommand($"insert into roles([Role_Id],[Role_Name],[Location],[Department],[Description])" +
-                    $" values(@Id,@Name,@Location,@Department,@Description)", connection);
+                    $" values(@Id,@Name,@Location,@Department,@Description)", sqlConnection);
                 command.Parameters.Add("@Id", SqlDbType.Int).Value =role.Id;
                 command.Parameters.Add("@Name", SqlDbType.VarChar).Value =role.Name;
                 command.Parameters.Add("@Location", SqlDbType.VarChar).Value =role.Location;
@@ -61,10 +50,10 @@ namespace EmployeeDirectory.DAL.Data
         public Dictionary<int, string> GenerateRoleList()
         {
             Dictionary<int, string> roles=new();
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = connection.GetConnection())
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand("select Role_Id,Role_Name from Roles", connection);
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand("select Role_Id,Role_Name from Roles", sqlConnection);
                 SqlDataReader sqlDataReader = cmd.ExecuteReader();
                 while (sqlDataReader.Read())
                 {

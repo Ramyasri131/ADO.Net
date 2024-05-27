@@ -1,14 +1,14 @@
 ﻿using System.Globalization;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using EmployeeDirectory.DAL.Extensions;
+using EmployeeDirectory.BAL.Extensions;
 using EmployeeDirectory.BAL.Providers;
 
 namespace EmployeeDirectory.BAL.Validators
 {
     public static class EmployeeValidator
     {
-        public static List<string> ValidateDetails(BAL.DTO.Employee employee)
+        public static List<string> ValidateDetails(DTO.Employee employee)
         {
             int selectedKey;
             List<string> invalidInputs = [];
@@ -90,7 +90,7 @@ namespace EmployeeDirectory.BAL.Validators
             return invalidInputs;
         }
 
-        public static void ValidateData(string label,string inputData)
+        public static void ValidateData(string label,string? inputData)
         {
             if(inputData.IsNullOrEmptyOrWhiteSpace())
             {
@@ -116,13 +116,13 @@ namespace EmployeeDirectory.BAL.Validators
                     break;
                 case "Email":
                     Regex formatOfEmail = new Regex("^[a-zA-Z0-9._%+-]+@tezo.com$");
-                    if (!formatOfEmail.IsMatch(inputData))
+                    if (!formatOfEmail.IsMatch(inputData!))
                     {
                         throw new BAL.Exceptions.InvalidData("Please enter valid Email");
                     }
                     break;
                 case "MobileNumber":
-                    if (inputData.Length != 10 || int.TryParse(inputData, out _))
+                    if (inputData!.Length != 10 || int.TryParse(inputData, out _))
                     {
                         throw new BAL.Exceptions.InvalidData("Please enter valid mobile number");
                     }

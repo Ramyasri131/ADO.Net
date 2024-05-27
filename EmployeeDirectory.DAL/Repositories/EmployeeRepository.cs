@@ -1,25 +1,16 @@
 ﻿using EmployeeDirectory.DAL.Interfaces;
-using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
 namespace EmployeeDirectory.DAL.Data
 {
     
-    public class EmployeeRepository: IEmployeeRepository
+    public class EmployeeRepository(IConnectionRepository connection) : IEmployeeRepository
     {
 
-        private readonly IConfiguration _configuration;
-        private readonly string connectionString;
-
-        public EmployeeRepository(IConfiguration configuration) {
-            _configuration = configuration;
-            connectionString = _configuration.GetConnectionString("EmployeeDirectoryDB");
-        }
-
-        public  List<Models.Employee> GetEmployeeDetails()
+        public List<Models.Employee> GetEmployeeDetails()
         {
-            SqlConnection sqlConnection = new SqlConnection(connectionString);
+            SqlConnection sqlConnection = connection.GetConnection();
             sqlConnection.Open();
             SqlCommand sqlCommand = new SqlCommand("select * from Employee", sqlConnection);
             SqlDataReader reader = sqlCommand.ExecuteReader();
@@ -48,10 +39,10 @@ namespace EmployeeDirectory.DAL.Data
 
         public  Models.Employee? GetEmployee(string? id)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = connection.GetConnection())
             {
-                connection.Open();
-                SqlCommand sqlCommand = new SqlCommand($"select * from Employee where Employee_Id=@ID;", connection);
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand($"select * from Employee where Employee_Id=@ID;", sqlConnection);
                 sqlCommand.Parameters.Add("@ID", SqlDbType.VarChar).Value = id;
                 SqlDataReader reader = sqlCommand.ExecuteReader();
                 while (reader.Read())
@@ -79,10 +70,10 @@ namespace EmployeeDirectory.DAL.Data
 
         public  void InsertEmployee(Models.Employee employee)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = connection.GetConnection())
             {
-                connection.Open();
-                SqlCommand sqlCommand = new SqlCommand($"insert into Employee([Employee_Id],[FirstName],[LastName],[Email],[MobileNumber],[DateOfBirth],[DateOfJoin],[Location],[JobTitle],[Department],[Manager],[Project]) values(@Id,@FirstName,@LastName,@Email,@MobileNumber,@DateOfBirth,@DateOfJoin,@Location,@JobTitle,@Department,@Manager,@Project);", connection);
+                sqlConnection.Open();
+                SqlCommand sqlCommand = new SqlCommand($"insert into Employee([Employee_Id],[FirstName],[LastName],[Email],[MobileNumber],[DateOfBirth],[DateOfJoin],[Location],[JobTitle],[Department],[Manager],[Project]) values(@Id,@FirstName,@LastName,@Email,@MobileNumber,@DateOfBirth,@DateOfJoin,@Location,@JobTitle,@Department,@Manager,@Project);", sqlConnection);
                 sqlCommand.Parameters.Add("@ID", SqlDbType.VarChar).Value = employee.Id;
                 sqlCommand.Parameters.Add("@FirstName",SqlDbType.VarChar).Value = employee.FirstName;
                 sqlCommand.Parameters.Add("@LastName",SqlDbType.VarChar).Value = employee.LastName;
@@ -96,15 +87,18 @@ namespace EmployeeDirectory.DAL.Data
                 sqlCommand.Parameters.Add("@Manager", SqlDbType.Int).Value = employee.Manager;
                 sqlCommand.Parameters.Add("@Project", SqlDbType.Int).Value = employee.Project;
                 sqlCommand.ExecuteNonQuery();
+
+
+
             }
         }
 
         public  void UpdateEmployee(string selectedData, string? id, string label)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = connection.GetConnection())
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand($"update Employee set {label}=@selectedData where Employee_Id=@Id;", connection);
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand($"update Employee set {label}=@selectedData where Employee_Id=@Id;", sqlConnection);
                 cmd.Parameters.Add("@selectedData", SqlDbType.VarChar).Value = selectedData;
                 cmd.Parameters.Add("@Id", SqlDbType.VarChar).Value =id;
                 cmd.ExecuteNonQuery();
@@ -113,10 +107,10 @@ namespace EmployeeDirectory.DAL.Data
 
         public  void DeleteEmployee(string? id)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection sqlConnection = connection.GetConnection())
             {
-                connection.Open();
-                SqlCommand cmd = new SqlCommand($"Delete Employee where Employee_Id=@Id;", connection);
+                sqlConnection.Open();
+                SqlCommand cmd = new SqlCommand($"Delete Employee where Employee_Id=@Id;", sqlConnection);
                 cmd.Parameters.Add("@Id", SqlDbType.VarChar).Value = id;
                 cmd.ExecuteNonQuery();
             }
