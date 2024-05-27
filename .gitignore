@@ -10,3 +10,7 @@
 /EmployeeDirectory.DAL/bin/Debug/net8.0
 /EmployeeDirectory.DAL/obj
 /.vs/ProjectEvaluation
+/.vs
+/EmployeeDirectory/bin/Release/net8.0
+/EmployeeDirectory.BAL/bin/Release/net8.0
+/EmployeeDirectory.DAL/bin/Release/net8.0
