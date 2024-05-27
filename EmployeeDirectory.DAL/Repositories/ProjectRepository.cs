@@ -3,7 +3,7 @@ using System.Data.SqlClient;
 
 namespace EmployeeDirectory.DAL.Repository
 {
-    public class ProjectsRepository(IConnectionRepository connection) : IProjectRepository
+    public class ProjectRepository(IConnectionRepository connection) : IProjectRepository
     {
 
         public Dictionary<int, string> GetProjects()

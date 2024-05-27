@@ -6,14 +6,10 @@ using EmployeeDirectory.BAL.Interfaces;
 
 namespace EmployeeDirectory.BAL.Providers
 {
-    public class RoleProvider:IRoleProvider
+    public class RoleProvider(IRoleRepository roleRepository) : IRoleProvider
     {
         public static Dictionary<int, string> Roles = new();
-        private readonly IRoleRepository _roleRepository;
-
-        public RoleProvider(IRoleRepository roleRepository) {
-            _roleRepository = roleRepository;
-        }
+        private readonly IRoleRepository _roleRepository = roleRepository;
 
         public void AddRole(DTO.Role roleInput)
         {

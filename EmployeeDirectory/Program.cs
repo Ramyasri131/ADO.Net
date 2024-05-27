@@ -23,7 +23,7 @@ namespace EmployeeDirectory
             serviceCollection.AddScoped<IDepartmentRepository, DepartmentRepository>();
             serviceCollection.AddScoped<ILocationRepository, LocationRepository>();
             serviceCollection.AddScoped<IManagerRepository, ManagerRepository>();
-            serviceCollection.AddScoped<IProjectRepository, ProjectsRepository>();
+            serviceCollection.AddScoped<IProjectRepository, ProjectRepository>();
             serviceCollection.AddSingleton<IEmployeeProvider, EmployeeProvider>();
             serviceCollection.AddSingleton<IRoleProvider, RoleProvider>();
             serviceCollection.AddSingleton<IDepartmentProvider, DepartmentsProvider>();

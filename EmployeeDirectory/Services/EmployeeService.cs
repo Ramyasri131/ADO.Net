@@ -8,14 +8,9 @@ using EmployeeDirectory.BAL.Interfaces;
 
 namespace EmployeeDirectory.Services
 {
-    public class EmployeeService: IEmployeeService
+    public class EmployeeService(IEmployeeProvider employeeProvider) : IEmployeeService
     {
-        private readonly IEmployeeProvider _employeeProvider;
-
-        public EmployeeService(IEmployeeProvider employeeProvider)
-        {
-            _employeeProvider = employeeProvider;
-        }
+        private readonly IEmployeeProvider _employeeProvider = employeeProvider;
 
         public void GetEmployee()
         {

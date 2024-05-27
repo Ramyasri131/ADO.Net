@@ -8,15 +8,10 @@ using EmployeeDirectory.BAL.Interfaces;
 namespace EmployeeDirectory.BAL.Providers
 {
    
-    public class EmployeeProvider:IEmployeeProvider
+    public class EmployeeProvider(IEmployeeRepository employeeRepository) : IEmployeeProvider
     {
 
-        private readonly IEmployeeRepository _employeeRepository;
-
-        public EmployeeProvider(IEmployeeRepository employeeRepository)
-        {
-            _employeeRepository = employeeRepository;
-        }
+        private readonly IEmployeeRepository _employeeRepository = employeeRepository;
 
         public void AddEmployee(DTO.Employee employee)
         {

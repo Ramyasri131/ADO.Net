@@ -8,27 +8,15 @@ using EmployeeDirectory.BAL.Interfaces;
 namespace EmployeeDirectory.Manager
 {
    
-    public class Menu : IMenuManager
+    public class Menu(IEmployeeService employeeService, IRoleService roleService, IRoleProvider roleProvider, IDepartmentProvider departmentProvider, ILocationProvider locationProvider, IManagerProvider managerProvider, IProjectProvider projectProvider) : IMenuManager
     {
-        private readonly IEmployeeService _employeeService;
-        private readonly IRoleService _roleService;
-        private readonly IRoleProvider _roleProvider;
-        private readonly IDepartmentProvider _departmentProvider;
-        private readonly ILocationProvider _locationProvider;
-        private readonly IManagerProvider _managerProvider;
-        private readonly IProjectProvider _projectProvider;
-
-
-        public Menu(IEmployeeService employeeService, IRoleService roleService, IRoleProvider roleProvider, IDepartmentProvider departmentProvider, ILocationProvider locationProvider, IManagerProvider managerProvider, IProjectProvider projectProvider)
-        {
-            _employeeService = employeeService;
-            _roleService = roleService;
-            _roleProvider = roleProvider;
-            _departmentProvider = departmentProvider;
-            _locationProvider = locationProvider;
-            _managerProvider = managerProvider;
-            _projectProvider = projectProvider;
-        }
+        private readonly IEmployeeService _employeeService = employeeService;
+        private readonly IRoleService _roleService = roleService;
+        private readonly IRoleProvider _roleProvider = roleProvider;
+        private readonly IDepartmentProvider _departmentProvider = departmentProvider;
+        private readonly ILocationProvider _locationProvider = locationProvider;
+        private readonly IManagerProvider _managerProvider = managerProvider;
+        private readonly IProjectProvider _projectProvider = projectProvider;
 
         public void DisplayMainMenu()
         {

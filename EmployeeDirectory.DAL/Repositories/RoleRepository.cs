@@ -17,7 +17,7 @@ namespace EmployeeDirectory.DAL.Data
                 List<Models.Role> roleList = new List<Models.Role>();
                 while (reader.Read())
                 {
-                    Models.Role role = new()
+                    Role role = new()
                     {
                         Id = int.Parse(reader["Role_Id"].ToString()!),
                         Name = reader["Role_Name"].ToString(),
